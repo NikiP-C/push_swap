@@ -6,7 +6,7 @@
 /*   By: nphilipp <nphilipp@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/03/08 19:08:48 by nphilipp      #+#    #+#                 */
-/*   Updated: 2021/03/15 16:57:32 by nphilipp      ########   odam.nl         */
+/*   Updated: 2021/03/22 18:52:36 by nphilipp      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,33 @@ void	error(int error_hand)
 	exit(error_hand);
 }
 
-void	do_sasb(int *list)
+void	swap_first(t_list *head)
 {
-	int	i;
+	void	*info;
 
-	i = list[0];
-	list[0] = list[1];
-	list[1] = i;
+	info = head->content;
+	head->content = head->next->content;
+	head->next->content = info;
 }
 
-int	sorter(int *list_a, int count)
+void	push_first(t_list **head_a, t_list **head_b)
+{
+	t_list	*tmp;
+
+	ft_lstadd_front(head_a, *head_b);
+	tmp = (*head_b)->next;
+	free(*head_b);
+	head_b = &tmp;
+}
+
+
+void	rotate(t_list **head)
+{
+	ft_lstadd_back(head, *head);
+	head = &(*head)->next;
+}
+
+int	sorter(int *list_a, int *list_b, int count)
 {
 	int		gnl_ret;
 	char	*str;
@@ -38,28 +55,22 @@ int	sorter(int *list_a, int count)
 	while (gnl_ret == 1)
 	{
 		gnl_ret = get_next_line(0, &str);
-		if (ft_strcmp(str, "sa", 3))
-			do_sasb(&list_a);
-		else if (ft_strncmp(str, "sb", 3))
-			do_sasb(&list_a);
-		else if (ft_strncmp(str, "ss", 3))
-			do_ss(&list_a);
+		if (ft_strcmp(str, "sa", 3) || ft_strcmp(str, "ss", 3))
+			swap_first(&list_a);
+		if (ft_strncmp(str, "sb", 3) || ft_strcmp(str, "ss", 3))
+			swap_first(&list_b);
 		else if (ft_strncmp(str, "pa", 3))
-			do_pa(&list_a);
+			push_first(&list_a, &list_b);
 		else if (ft_strncmp(str, "pb", 3))
-			do_sb(&list_a);
-		else if (ft_strncmp(str, "ra", 3))
-			do_sb(&list_a);
-		else if (ft_strncmp(str, "rb", 3))
-			do_ss(&list_a);
-		else if (ft_strncmp(str, "rr", 3))
-			do_pa(&list_a);
-		else if (ft_strncmp(str, "rra", 4))
-			do_sb(&list_a);
-		else if (ft_strncmp(str, "rrb", 4))
-			do_sb(&list_a);
-		else if (ft_strncmp(str, "rrr", 4))
-			do_sb(&list_a);
+			push_first(&list_b, &list_a);
+		else if (ft_strncmp(str, "ra", 3) || ft_strncmp(str, "rr", 3))
+			rotate(&list_a);
+		else if (ft_strncmp(str, "rb", 3) || ft_strncmp(str, "rr", 3))
+			rotate(&list_b);
+		else if (ft_strncmp(str, "rra", 4) || ft_strncmp(str, "rrr", 4))
+			reverse_rotate(&list_a);
+		else if (ft_strncmp(str, "rrb", 4) || ft_strncmp(str, "rrr", 4))
+			reverse_rotate(&list_b);
 	}
 }
 
